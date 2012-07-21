@@ -302,14 +302,13 @@ public abstract class StreamServer
 		public void run()
 		{
 			try{
-	            openInputStream();
+	            //openInputStream();
 	            handleResponse(socket);
-	         }catch(IOException e){
-	            e.printStackTrace();
 	         }finally {
 	            if(is!=null) {
 	               try{
 	                  is.close();
+	                  socket.close();
 	               }catch(IOException e){
 	                  e.printStackTrace();
 	               }
@@ -317,9 +316,9 @@ public abstract class StreamServer
 	         }
 		}
 		
-		private void openInputStream() throws IOException {
-			is = socket.getInputStream();
-		}
+//		private void openInputStream() throws IOException {
+//			is = socket.getInputStream();
+//		}
 
 		private void handleResponse(Socket socket) {
 			try {
@@ -456,7 +455,6 @@ public abstract class StreamServer
 					sendResponse(socket, r.status, r.mimeType, r.header, r.data );
 
 				in.close();
-				is.close();
 			}
 			catch ( IOException ioe )
 			{

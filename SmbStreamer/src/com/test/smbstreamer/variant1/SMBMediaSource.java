@@ -15,7 +15,7 @@ public class SMBMediaSource extends StreamSource{
 	public SMBMediaSource(SmbFile file, String mime) throws StreamSourceException {
 		this.file = file;
 		this.mime = mime;
-		
+		this.name = file.getName();
 		try {
 			len = file.length();
 		} catch (SmbException e) {
