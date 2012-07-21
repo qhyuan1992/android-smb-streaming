@@ -7,6 +7,7 @@ public abstract class StreamSource {
 	protected String mime;
 	protected long fp;
 	protected long len;
+	protected String name;
 	
 	public StreamSource() throws StreamSourceException{
 		fp = 0;
@@ -21,6 +22,9 @@ public abstract class StreamSource {
 	}
 	public long length(){
 		return len;
+	}
+	public String getName(){
+		return name;
 	}
 	public abstract void close();
 	public long available(){

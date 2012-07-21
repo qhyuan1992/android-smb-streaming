@@ -46,8 +46,9 @@ public class Streamer extends StreamServer {
 		Response res = null;
 		try
 		{
-			if ( res == null )
-			{
+			if(!uri.endsWith(source.getName()))
+				res = new Response(HTTP_NOTFOUND, MIME_PLAINTEXT, null);
+			else{
 				long startFrom = 0;
 				long endAt = -1;
 				String range = header.getProperty( "range" );
