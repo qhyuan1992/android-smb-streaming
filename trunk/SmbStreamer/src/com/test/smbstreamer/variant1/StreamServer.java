@@ -2,8 +2,9 @@ package com.test.smbstreamer.variant1;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -14,16 +15,13 @@ import java.net.Socket;
 import java.net.URLEncoder;
 import java.util.Date;
 import java.util.Enumeration;
-import java.util.Vector;
-import java.util.Hashtable;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.TimeZone;
+import java.util.Vector;
 
-import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
-
+import android.net.Uri;
 import android.util.Log;
 
 /**
@@ -195,7 +193,6 @@ public abstract class StreamServer
 	//private HTTPSession session;
 	public StreamServer( int port, File wwwroot ) throws IOException
 	{
-		System.out.println("HEJEHEJEJ!");
 		myTcpPort = port;
 		this.myRootDir = wwwroot;
 		myServerSocket = new ServerSocket( myTcpPort );
@@ -285,7 +282,7 @@ public abstract class StreamServer
 	 * Handles one session, i.e. parses the HTTP request
 	 * and returns the response.
 	 */
-	private class HTTPSession extends Thread
+	private class HTTPSession implements Runnable
 	{
 		private InputStream is;
 		private final Socket socket;
@@ -335,7 +332,7 @@ public abstract class StreamServer
 
 				// Create a BufferedReader for parsing the header.
 				ByteArrayInputStream hbis = new ByteArrayInputStream(buf, 0, rlen);
-				BufferedReader hin = new BufferedReader( new InputStreamReader( hbis ));
+				BufferedReader hin = new BufferedReader( new InputStreamReader( hbis , "utf-8"));
 				Properties pre = new Properties();
 				Properties parms = new Properties();
 				Properties header = new Properties();
@@ -438,7 +435,7 @@ public abstract class StreamServer
 						{
 							postLine += String.valueOf(pbuf, 0, read);
 							read = in.read(pbuf);
-							if(interrupted()){
+							if(Thread.interrupted()){
 								throw new InterruptedException();
 							}
 						}
@@ -501,7 +498,7 @@ public abstract class StreamServer
 					decodeParms( uri.substring( qmi+1 ), parms );
 					uri = decodePercent( uri.substring( 0, qmi ));
 				}
-				else uri = decodePercent(uri);
+				else uri = Uri.decode(uri);//decodePercent(uri);
 
 				// If there's another token, it's protocol version,
 				// followed by HTTP headers. Ignore version but parse headers.
@@ -797,6 +794,7 @@ public abstract class StreamServer
 				if ( data != null )
 				{
 					//long pending = data.available();	// This is to support partial sends, see serveFile()
+					data.open();
 					byte[] buff = new byte[8192];
 					int read = 0;
 					while ((read = data.read(buff))>0){
