@@ -13,8 +13,6 @@ import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 
-import com.test.smbstreamer.variant1.SMBMediaSource;
-import com.test.smbstreamer.variant1.StreamSourceException;
 import com.test.smbstreamer.variant1.Streamer;
 
 public class MainActivity extends Activity {
@@ -42,7 +40,7 @@ public class MainActivity extends Activity {
 			public void run(){
 				try{
 					SmbFile file = new SmbFile(c.path, auth);
-					s.setStreamSrc(new SMBMediaSource(file, c.mime));
+					s.setStreamSrc(file)
 					runOnUiThread(new Runnable(){
 						public void run(){
 							try{
@@ -55,8 +53,6 @@ public class MainActivity extends Activity {
 						}
 					});
 					
-				} catch (StreamSourceException e) {
-					e.printStackTrace();
 				} catch (MalformedURLException e) {
 					e.printStackTrace();
 				}
