@@ -2,7 +2,9 @@ package com.test.smbstreamer.variant1;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Properties;
+import java.util.regex.Pattern;
 
 import jcifs.smb.SmbFile;
 import android.util.Log;
@@ -12,9 +14,11 @@ public class Streamer extends StreamServer {
 	public static final int PORT = 7871;
 	public static final String URL = "http://127.0.0.1:" + PORT;
 	private SmbFile file;
+	protected List<SmbFile> extras; //those can be subtitles
 	// private InputStream stream;
 	// private long length;
 	private static Streamer instance;
+	private static Pattern pattern = Pattern.compile("^.*\\.(?i)(mp3|wma|wav|aac|ogg|m4a|flac|mp4|avi|mpg|mpeg|3gp|3gpp|mkv|flv|rmvb)$");
 
 	// private CBItem source;
 	// private String mime;
@@ -33,16 +37,32 @@ public class Streamer extends StreamServer {
 		return instance;
 	}
 
-	public void setStreamSrc(SmbFile file) {
+	public static boolean isStreamMedia(SmbFile file) {
+		return pattern.matcher(file.getName()).matches();
+	}
+
+	public void setStreamSrc(SmbFile file,List<SmbFile> extraFiles) {
 		this.file = file;
+		this.extras = extraFiles;
 	}
 
 	@Override
 	public Response serve(String uri, String method, Properties header, Properties parms, Properties files) {
 		Response res = null;
 		try {
+			SmbFile sourceFile = null;
 			String name = getNameFromPath(uri);
-			if (file==null || !file.getName().equals(name))
+			if(file!=null && file.getName().equals(name))
+				sourceFile = file;
+			else if(extras!=null){
+				for(SmbFile i : extras){
+					if(i!=null && i.getName().equals(name)){
+						sourceFile = i;
+						break;
+					}
+				}
+			}
+			if (sourceFile==null)
 				res= new Response(HTTP_NOTFOUND, MIME_PLAINTEXT, null);
 			else {
 
@@ -67,7 +87,7 @@ public class Streamer extends StreamServer {
 				// Change return code and add Content-Range header when skipping
 				// is requested
 				//source.open();
-				final StreamSource source = new StreamSource(file);
+				final StreamSource source = new StreamSource(sourceFile);
 				long fileLen = source.length();
 				if (range != null && startFrom > 0) {
 					if (startFrom >= fileLen) {

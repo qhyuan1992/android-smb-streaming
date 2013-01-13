@@ -1,5 +1,6 @@
 package com.test.smbstreamer.variant1;
 
+
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -750,7 +751,6 @@ public abstract class StreamServer
 		private void sendError(Socket socket, String status, String msg ) throws InterruptedException
 		{
 			sendResponse(socket, status, MIME_PLAINTEXT, null, null);
-			Log.d("Explorer", "Sending error "+msg);
 			throw new InterruptedException();
 		}
 
@@ -788,7 +788,6 @@ public abstract class StreamServer
 
 				pw.print("\r\n");
 				pw.flush();
-				Log.d("Explorer", "Response sent: "+status);
 
 
 				if ( data != null )
@@ -798,10 +797,9 @@ public abstract class StreamServer
 					byte[] buff = new byte[8192];
 					int read = 0;
 					while ((read = data.read(buff))>0){
-						Log.d("Explorer", "Read: "+ read +", pending: "+ data.available());
+						//if(SolidExplorer.LOG)Log.d("Explorer", "Read: "+ read +", pending: "+ data.available());
 						out.write( buff, 0, read );
 					}
-					Log.d("Explorer", "End of stream");
 				}
 				out.flush();
 				out.close();
