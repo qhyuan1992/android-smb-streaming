@@ -1,5 +1,6 @@
 package com.test.smbstreamer;
 
+import java.io.File;
 import java.net.MalformedURLException;
 
 import jcifs.smb.NtlmPasswordAuthentication;
@@ -40,12 +41,13 @@ public class MainActivity extends Activity {
 			public void run(){
 				try{
 					SmbFile file = new SmbFile(c.path, auth);
-					s.setStreamSrc(file)
+					s.setStreamSrc(file, null);//the second argument can be a list of subtitle files
 					runOnUiThread(new Runnable(){
 						public void run(){
 							try{
+								Uri uri = Uri.parse(Streamer.URL + Uri.fromFile(new File(Uri.parse(c.path).getPath())).getEncodedPath());
 								Intent i = new Intent(Intent.ACTION_VIEW);
-								i.setDataAndType(Uri.parse(c.URL), c.mime);
+								i.setDataAndType(uri, c.mime);
 								startActivity(i);
 							}catch (ActivityNotFoundException e){
 								e.printStackTrace();

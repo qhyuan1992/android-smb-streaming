@@ -2,8 +2,6 @@ package com.test.smbstreamer.variant1;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.UnknownHostException;
 
 import jcifs.smb.SmbException;
 import jcifs.smb.SmbFile;
@@ -58,10 +56,10 @@ public class StreamSource {
 	public void open() throws IOException {
 		try {
 			input = new SmbFileInputStreamOld(file, bufferSize, 1);
-			input.skip(fp);
-		} catch (SmbException e) {
-		} catch (MalformedURLException e) {
-		} catch (UnknownHostException e) {
+			if(fp>0)
+				input.skip(fp);
+		} catch (Exception e) {
+			throw new IOException(e);
 		}
 	}
 	public int read(byte[] buff) throws IOException{
